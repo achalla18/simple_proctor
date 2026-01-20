@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Proctoring System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: #16213e;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            color: #00ff88;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+        
+        .video-section {
+            background: #16213e;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .video-container {
+            background: black;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .video-container img {
+            width: 100%;
+            display: block;
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .card {
+            background: #16213e;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .card h3 {
+            color: #00ff88;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: #00ff88;
+        }
+        
+        .stat-value.warning {
+            color: #ffc107;
+        }
+        
+        .stat-value.danger {
+            color: #ff4444;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .btn-primary {
+            background: #00ff88;
+            color: #1a1a2e;
+        }
+        
+        .btn-primary:hover {
+            background: #00cc6a;
+        }
+        
+        .instructions {
+            font-size: 14px;
+            color: #888;
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin: 5px 0;
+        }
+        
+        @media (max-width: 800px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎓 AI Proctoring System</h1>
+        <p>Real-time exam monitoring with AI</p>
+    </div>
+    
+    <div class="container">
+        <div class="video-section">
+            <h3>📹 Live Feed</h3>
+            <div class="video-container">
+                <img id="videoFeed" src="/video_feed" alt="Video Feed">
+            </div>
+        </div>
+        
+        <div class="sidebar">
+            <div class="card">
+                <h3>📊 Session Stats</h3>
+                <div class="stat-row">
+                    <span>Time Elapsed</span>
+                    <span class="stat-value" id="timeElapsed">00:00</span>
+                </div>
+                <div class="stat-row">
+                    <span>Violations</span>
+                    <span class="stat-value" id="violations">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Frames</span>
+                    <span class="stat-value" id="frames">0</span>
+                </div>
+                <button class="btn btn-primary" onclick="resetSession()">
+                    🔄 Reset Session
+                </button>
+            </div>
+            
+            <div class="card">
+                <h3>📋 Instructions</h3>
+                <ul class="instructions">
+                    <li>Keep your face visible at all times</li>
+                    <li>Look at the screen during the exam</li>
+                    <li>Only one person should be visible</li>
+                    <li>Avoid looking away for too long</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3>⚡ Detection Features</h3>
+                <ul class="instructions">
+                    <li>✅ Face presence detection</li>
+                    <li>✅ Multiple face detection</li>
+                    <li>✅ Gaze tracking</li>
+                    <li>✅ Real-time alerts</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Update stats every second
+        function updateStats() {
+            fetch('/api/stats')
+                .then(response => response.json())
+                .then(data => {
+                    // Update time
+                    const mins = Math.floor(data.elapsed_seconds / 60);
+                    const secs = data.elapsed_seconds % 60;
+                    document.getElementById('timeElapsed').textContent = 
+                        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    
+                    // Update violations
+                    const violationsEl = document.getElementById('violations');
+                    violationsEl.textContent = data.violation_count || 0;
+                    violationsEl.className = 'stat-value';
+                    if (data.violation_count > 5) {
+                        violationsEl.classList.add('danger');
+                    } else if (data.violation_count > 0) {
+                        violationsEl.classList.add('warning');
+                    }
+                    
+                    // Update frames
+                    document.getElementById('frames').textContent = data.frame_count || 0;
+                })
+                .catch(err => console.log('Stats error:', err));
+        }
+        
+        function resetSession() {
+            fetch('/api/reset', { method: 'POST' })
+                .then(() => {
+                    alert('Session reset!');
+                    updateStats();
+                })
+                .catch(err => console.log('Reset error:', err));
+        }
+        
+        // Update stats every second
+        setInterval(updateStats, 1000);
+        updateStats();
+    </script>
+</body>
+</html>
