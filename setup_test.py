@@ -1,4 +1,3 @@
-#
 # Setup and Test Script for AI Proctoring System
 
 import sys
@@ -17,16 +16,16 @@ def check_opencv():
         import cv2
         print(f"✓ OpenCV version: {cv2.__version__}")
         
-        # Check if Haar cascades are available
+        # Check Cascade availability
         cascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
         cascade = cv2.CascadeClassifier(cascade_path)
         if cascade.empty():
-            print("  ⚠ Haar cascades not found")
+            print("Haar cascades not found")
         else:
-            print("  ✓ Haar cascades available (fallback face detection)")
+            print("cascades available (fallback face detection)")
         return True
     except ImportError:
-        print("✗ OpenCV not installed")
+        print("OpenCV not installed")
         print("  Run: pip install opencv-python")
         return False
 
@@ -34,13 +33,12 @@ def check_mediapipe():
     try:
         import mediapipe as mp
         
-        # Check if solutions attribute exists
         if not hasattr(mp, 'solutions'):
             print("✗ MediaPipe installed but broken")
             print("  Run: pip uninstall mediapipe -y && pip install mediapipe")
             return False
         
-        # Try to access face detection
+        #Access face detection
         face_det = mp.solutions.face_detection
         face_mesh = mp.solutions.face_mesh
         
@@ -159,7 +157,7 @@ def main():
         print("  python proctoring.py      # CLI mode")
         print("  python web_app.py         # Web interface")
     else:
-        print("⚠ Some checks failed. Fix the issues above first.")
+        print("Some checks failed. Fix the issues above first.")
         print()
         print("Quick fix - reinstall all dependencies:")
         print("  pip uninstall opencv-python mediapipe flask numpy -y")
