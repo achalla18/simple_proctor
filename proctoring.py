@@ -446,10 +446,9 @@ class Alert:
 
 
 class ProctorSystem:
-    """Main proctoring system that combines all detectors."""
     
     def __init__(self):
-        print("Initializing AI Proctoring System...")
+        print("Initializing Proctoring System...")
         
         # Initialize detectors
         self.face_detector = FaceDetector()
@@ -668,7 +667,7 @@ class ProctorSystem:
         cv2.rectangle(frame, (10, 10), (320, 110), (100, 100, 100), 2)
         
         # Title
-        cv2.putText(frame, "AI PROCTOR", (20, 35), 
+        cv2.putText(frame, "PROCTOR TAB", (20, 35), 
                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
         
         # Face status
