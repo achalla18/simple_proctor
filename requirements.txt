@@ -1,4 +1,3 @@
-# AI Proctoring System - Minimal Dependencies
 opencv-python>=4.5.0
 mediapipe>=0.10.0
 flask>=2.0.0
