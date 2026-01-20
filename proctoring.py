@@ -24,7 +24,6 @@ except ImportError as e:
 
 
 class FaceDetector:
-    """Face detection - uses MediaPipe if available, otherwise Haar Cascades."""
     
     def __init__(self):
         self.use_mediapipe = MEDIAPIPE_AVAILABLE
@@ -42,17 +41,13 @@ class FaceDetector:
                 raise RuntimeError("Failed to load Haar Cascade classifier")
     
     def detect(self, frame):
-        """
-        Detect faces in frame.
-        Returns: (face_count, face_boxes)
-        """
+
         if self.use_mediapipe:
             return self._detect_mediapipe(frame)
         else:
             return self._detect_haar(frame)
     
     def _detect_mediapipe(self, frame):
-        """MediaPipe face detection."""
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = self.detector.process(rgb)
         
@@ -74,7 +69,6 @@ class FaceDetector:
         return len(faces), faces
     
     def _detect_haar(self, frame):
-        """OpenCV Haar Cascade face detection (fallback)."""
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         detections = self.detector.detectMultiScale(
             gray, scaleFactor=1.1, minNeighbors=5, minSize=(60, 60)
@@ -84,22 +78,14 @@ class FaceDetector:
         for (x, y, w, h) in detections:
             faces.append({
                 'box': (x, y, w, h),
-                'confidence': 0.9  # Haar doesn't provide confidence
+                'confidence': 0.9  
             })
         
         return len(faces), faces
 
 
 class GazeDetector:
-    """
-    Enhanced gaze detection using MediaPipe Face Mesh.
-    
-    Combines:
-    - Iris position tracking (where eyes are looking)
-    - Head pose estimation (which way head is turned)
-    - Smoothing to reduce false positives
-    """
-    
+
     def __init__(self):
         self.use_mediapipe = MEDIAPIPE_AVAILABLE
         
@@ -141,16 +127,7 @@ class GazeDetector:
         self.last_confidence = 0.0
     
     def detect(self, frame):
-        """
-        Detect gaze direction with enhanced accuracy.
-        
-        Returns: (gaze_detected, is_looking_center, direction, confidence, details)
-        - gaze_detected: bool - whether a face was found
-        - is_looking_center: bool - whether looking at screen
-        - direction: str - "center", "left", "right", "up", "down", "away"
-        - confidence: float - how confident we are (0-1)
-        - details: dict - additional info for visualization
-        """
+
         if not self.use_mediapipe:
             return False, True, "unavailable", 0.0, {}
         
@@ -202,10 +179,7 @@ class GazeDetector:
             return True, True, "center", 0.5, {'error': str(e)}
     
     def _get_iris_direction(self, landmarks, w, h):
-        """
-        Calculate gaze direction based on iris position within eye.
-        Returns: (direction, offset_magnitude)
-        """
+
         left_iris = self._get_iris_position(landmarks, self.LEFT_IRIS, self.LEFT_EYE, w, h)
         right_iris = self._get_iris_position(landmarks, self.RIGHT_IRIS, self.RIGHT_EYE, w, h)
         
@@ -236,7 +210,6 @@ class GazeDetector:
         return direction, (h_offset, v_offset)
     
     def _get_iris_position(self, landmarks, iris_indices, eye_indices, w, h):
-        """Calculate iris position ratio within eye bounds (0-1 scale)."""
         try:
             eye_points = [(landmarks[i].x * w, landmarks[i].y * h) for i in eye_indices]
             eye_x = [p[0] for p in eye_points]
@@ -264,10 +237,7 @@ class GazeDetector:
             return None
     
     def _get_head_pose(self, landmarks, w, h):
-        """
-        Estimate head pose (yaw, pitch, roll) from facial landmarks.
-        Returns angles in degrees.
-        """
+
         try:
             # Get key facial points
             nose = np.array([landmarks[self.NOSE_TIP].x * w, 
@@ -332,10 +302,7 @@ class GazeDetector:
             return 0.0, 0.0, 0.0
     
     def _combine_signals(self, iris_direction, iris_offset, head_yaw, head_pitch):
-        """
-        Combine iris direction and head pose for final gaze direction.
-        Returns: (direction, confidence)
-        """
+
         h_offset, v_offset = iris_offset
         
         # Start with iris-based direction
@@ -388,9 +355,7 @@ class GazeDetector:
         return direction, min(1.0, confidence)
     
     def _smooth_detection(self, direction, confidence):
-        """
-        Apply temporal smoothing to reduce jitter and false positives.
-        """
+
         # Add to history
         self.gaze_history.append((direction, confidence))
         
