@@ -1,17 +1,3 @@
-"""
-AI Proctoring System - Simple Version
-=====================================
-A simple exam proctoring system using OpenCV and MediaPipe.
-
-Features:
-- Face detection (presence/absence)
-- Multiple face detection
-- OS-level notifications
-- Screenshot capture on violations
-
-Usage:
-    python proctoring.py
-"""
 
 import cv2
 import numpy as np
