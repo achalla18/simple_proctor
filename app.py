@@ -6,7 +6,7 @@ import threading
 from datetime import datetime
 from flask import Flask, Response, render_template, jsonify, request
 
-from proctoring import ProctorSystem
+from proctor import ProctorSystem
 
 app = Flask(__name__)
 
