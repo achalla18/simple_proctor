@@ -4,15 +4,15 @@ A simple, working AI proctoring system for exam monitoring.
 
 ## Features
 
-- ✅ Face detection (checks if your face is visible)
-- ✅ Multiple face detection (alerts if more than one person)
-- ✅ **Enhanced gaze tracking** with:
+- Face detection (checks if your face is visible)
+- Multiple face detection (alerts if more than one person)
+- **Enhanced gaze tracking** with:
   - Iris position tracking (where your eyes are looking)
   - Head pose estimation (which way your head is turned)
   - Smoothing to reduce false alerts
   - Visual indicators showing gaze direction
-- ✅ Real-time alerts and statistics
-- ✅ Web interface with live video
+- Real-time alerts and statistics
+- Web interface with live video
 
 ## Requirements
 
@@ -169,7 +169,3 @@ self.HEAD_PITCH_THRESHOLD = 15         # Degrees before head tilt triggers
 **Make it more sensitive** (catch more looking away):
 - Decrease thresholds (e.g., `IRIS_HORIZONTAL_THRESHOLD = 0.25`)
 - Decrease `HEAD_YAW_THRESHOLD` to 15
-
-## License
-
-Free to use for educational purposes.
