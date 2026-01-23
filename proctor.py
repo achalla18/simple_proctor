@@ -8,7 +8,7 @@ from datetime import datetime
 from collections import deque
 from pathlib import Path
 
-# Check MediaPipe installation
+# Check MediaPipe 
 try:
     import mediapipe as mp
     if not hasattr(mp, 'solutions'):
@@ -21,11 +21,9 @@ except ImportError as e:
     print(f"⚠ MediaPipe not available: {e}")
     print("  Using fallback face detection (Haar Cascades)")
 
-# Check for notification support
 NOTIFICATION_AVAILABLE = False
 notification_method = None
 
-# Try Windows toast notifications first
 try:
     from win10toast import ToastNotifier
     toaster = ToastNotifier()
@@ -58,7 +56,6 @@ def send_notification(title, message, duration=5):
     
     try:
         if notification_method == "win10toast":
-            # Run in thread to avoid blocking
             threading.Thread(
                 target=toaster.show_toast,
                 args=(title, message),
@@ -86,7 +83,7 @@ class ScreenshotManager:
         self.save_dir.mkdir(exist_ok=True)
         self.screenshot_count = 0
         self.last_screenshot_time = 0
-        self.min_interval = 3.0  # Minimum seconds between screenshots
+        self.min_interval = 3.0  # Min secs between screenshots
     
     def capture(self, frame, alert_type, message=""):
         """
@@ -95,26 +92,21 @@ class ScreenshotManager:
         """
         current_time = time.time()
         
-        # Check cooldown
         if current_time - self.last_screenshot_time < self.min_interval:
             return None
         
         self.last_screenshot_time = current_time
         self.screenshot_count += 1
         
-        # Create filename with timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"{alert_type}_{timestamp}_{self.screenshot_count:04d}.jpg"
         filepath = self.save_dir / filename
         
-        # Add overlay text to screenshot
         screenshot = frame.copy()
         h, w = screenshot.shape[:2]
         
-        # Add red border
         cv2.rectangle(screenshot, (0, 0), (w-1, h-1), (0, 0, 255), 5)
         
-        # Add alert info at bottom
         cv2.rectangle(screenshot, (0, h-60), (w, h), (0, 0, 0), -1)
         cv2.putText(screenshot, f"VIOLATION: {alert_type.upper()}", (10, h-35),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
@@ -222,20 +214,19 @@ class ProctorSystem:
     def __init__(self, screenshot_dir="screenshots", enable_notifications=True):
         print("Initializing AI Proctoring System...")
         
-        # Initialize components
+        # Initialize
         self.face_detector = FaceDetector()
         self.screenshot_manager = ScreenshotManager(screenshot_dir)
         self.enable_notifications = enable_notifications and NOTIFICATION_AVAILABLE
         
-        # State tracking
+        # tracking
         self.face_absent_since = None
         self.alerts = deque(maxlen=100)
         self.alert_cooldowns = {}
         
-        # Thresholds (in seconds)
         self.FACE_ABSENT_THRESHOLD = 3.0
         self.ALERT_COOLDOWN = 5.0
-        self.NOTIFICATION_COOLDOWN = 10.0  # Longer cooldown for notifications
+        self.NOTIFICATION_COOLDOWN = 10.0  
         self.notification_cooldowns = {}
         
         # Stats
@@ -258,7 +249,7 @@ class ProctorSystem:
         self.alert_cooldowns = {}
         self.notification_cooldowns = {}
         
-        # Send start notification
+        # notification
         if self.enable_notifications:
             send_notification(
                 "Proctoring Started",
@@ -275,7 +266,6 @@ class ProctorSystem:
         self.frame_count += 1
         current_time = time.time()
         
-        # Make a copy for annotation
         display = frame.copy()
         h, w = display.shape[:2]
         
@@ -325,10 +315,8 @@ class ProctorSystem:
                 cv2.putText(display, conf_text, (x, y - 10), 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, face_color, 2)
         
-        # --- Draw Status Panel ---
         self._draw_status_panel(display, face_status, face_color)
         
-        # --- Draw Alerts ---
         self._draw_alerts(display)
         
         return display
@@ -337,17 +325,14 @@ class ProctorSystem:
         """Add an alert with cooldown check, notification, and screenshot."""
         current_time = time.time()
         
-        # Check alert cooldown
         last_alert = self.alert_cooldowns.get(alert_type, 0)
         if current_time - last_alert < self.ALERT_COOLDOWN:
             return
         
-        # Capture screenshot
         screenshot_path = None
         if frame is not None:
             screenshot_path = self.screenshot_manager.capture(frame, alert_type, message)
         
-        # Create and store alert
         alert = Alert(alert_type, message, severity, screenshot_path)
         self.alerts.append(alert)
         self.alert_cooldowns[alert_type] = current_time
@@ -355,7 +340,6 @@ class ProctorSystem:
         
         print(f"⚠️ ALERT: {alert}")
         
-        # Send OS notification (with separate cooldown)
         if self.enable_notifications:
             last_notif = self.notification_cooldowns.get(alert_type, 0)
             if current_time - last_notif >= self.NOTIFICATION_COOLDOWN:
@@ -453,17 +437,14 @@ def run_cli():
     print("  N - Test notification")
     print()
     
-    # Initialize
     proctor = ProctorSystem(screenshot_dir="screenshots", enable_notifications=True)
     
-    # Open webcam
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("ERROR: Cannot open webcam!")
         print("Make sure your webcam is connected and not used by another app.")
         return
     
-    # Set resolution
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     
@@ -514,7 +495,6 @@ def run_cli():
         cap.release()
         cv2.destroyAllWindows()
         
-        # Print final stats
         stats = proctor.get_stats()
         print("\n" + "=" * 50)
         print("Session Summary")
@@ -524,7 +504,6 @@ def run_cli():
         print(f"Screenshots Captured: {stats['screenshot_count']}")
         print(f"Frames Processed: {stats['frame_count']}")
         
-        # List screenshots
         screenshots = proctor.get_screenshots()
         if screenshots:
             print(f"\nScreenshots saved in 'screenshots' folder:")
