@@ -1,6 +1,6 @@
-# AI Proctoring System - Simple Version
+# Machine Learning based Proctoring System - Simple Version
 
-A simple, working AI proctoring system for exam monitoring.
+A simple, working Machine Learning based proctoring system for exam monitoring.
 
 ## Features
 
