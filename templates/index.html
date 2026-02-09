@@ -1,425 +1,272 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Proctoring System</title>
+    <title>Proctor</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg-primary: #0f0f1a;
-            --bg-secondary: #1a1a2e;
-            --bg-card: #16213e;
-            --accent: #4f46e5;
-            --accent-hover: #6366f1;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --border: #334155;
-            --shadow: 0 4px 24px rgba(0,0,0,0.3);
-        }
-
-        [data-theme="light"] {
-            --bg-primary: #f8fafc;
-            --bg-secondary: #e2e8f0;
-            --bg-card: #ffffff;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --border: #cbd5e1;
-            --shadow: 0 4px 24px rgba(0,0,0,0.1);
+            --bg: #09090b;
+            --surface: #18181b;
+            --border: #27272a;
+            --text: #fafafa;
+            --muted: #71717a;
+            --accent: #a78bfa;
+            --green: #34d399;
+            --amber: #fbbf24;
+            --red: #f87171;
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
-            transition: all 0.3s ease;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 24px;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--accent), #8b5cf6);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        .header-controls {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .theme-toggle {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .theme-toggle:hover {
-            background: var(--bg-card);
-        }
-
-        .status-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .status-badge.active {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--success);
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: currentColor;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 380px;
-            gap: 24px;
-        }
-
-        @media (max-width: 1200px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .video-section {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .video-container {
-            position: relative;
-            background: var(--bg-card);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            aspect-ratio: 16/9;
-        }
-
-        .video-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .video-overlay {
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            right: 16px;
-            display: flex;
-            justify-content: space-between;
+        /* Subtle grain texture */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
             pointer-events: none;
+            z-index: 9999;
         }
 
-        .recording-indicator {
+        .app {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        /* ── Header ── */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-weight: 500;
+            color: var(--muted);
+        }
+
+        .brand-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .live-pill {
             display: flex;
             align-items: center;
             gap: 8px;
-            background: rgba(239, 68, 68, 0.9);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
             font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--green);
+            letter-spacing: 0.05em;
         }
 
-        .recording-indicator .dot {
-            width: 8px;
-            height: 8px;
-            background: white;
+        .live-pill::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--green);
             border-radius: 50%;
-            animation: blink 1s infinite;
+            animation: blink 1.6s ease-in-out infinite;
         }
 
         @keyframes blink {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
+            50% { opacity: 0.2; }
         }
 
-        .time-display {
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 0.875rem;
-        }
-
-        .alert-banner {
-            display: none;
-            align-items: center;
-            gap: 12px;
-            padding: 16px 20px;
-            border-radius: 12px;
-            font-weight: 500;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateY(-10px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .alert-banner.warning {
-            display: flex;
-            background: rgba(245, 158, 11, 0.15);
-            border: 1px solid var(--warning);
-            color: var(--warning);
-        }
-
-        .alert-banner.danger {
-            display: flex;
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid var(--danger);
-            color: var(--danger);
-        }
-
-        .quick-stats {
+        /* ── Layout ── */
+        .layout {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            grid-template-columns: 1fr 320px;
+            gap: 32px;
         }
 
-        @media (max-width: 768px) {
-            .quick-stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        @media (max-width: 960px) {
+            .layout { grid-template-columns: 1fr; }
         }
 
-        .stat-card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: var(--shadow);
+        /* ── Video ── */
+        .video-wrap {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--surface);
+            aspect-ratio: 16/9;
             border: 1px solid var(--border);
         }
 
-        .stat-card .label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+        .video-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .video-hud {
+            position: absolute;
+            inset: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            pointer-events: none;
+            background: linear-gradient(180deg, rgba(9,9,11,0.5) 0%, transparent 30%, transparent 70%, rgba(9,9,11,0.5) 100%);
+        }
+
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .rec-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.65rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            color: var(--red);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+        }
+
+        .rec-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--red);
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        .timer {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .hud-bottom {
+            display: flex;
+            justify-content: center;
+        }
+
+        .alert-toast {
+            display: none;
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            backdrop-filter: blur(16px);
+            animation: toastIn 0.3s ease;
+        }
+
+        .alert-toast.warning {
+            display: block;
+            background: rgba(251, 191, 36, 0.15);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            color: var(--amber);
+        }
+
+        .alert-toast.danger {
+            display: block;
+            background: rgba(248, 113, 113, 0.15);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            color: var(--red);
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Stats Row ── */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .stat {
+            background: var(--surface);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
             margin-bottom: 8px;
         }
 
-        .stat-card .value {
-            font-size: 1.75rem;
-            font-weight: 700;
+        .stat-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 500;
         }
 
-        .stat-card.success .value { color: var(--success); }
-        .stat-card.warning .value { color: var(--warning); }
-        .stat-card.danger .value { color: var(--danger); }
+        .stat-val.green { color: var(--green); }
+        .stat-val.amber { color: var(--amber); }
+        .stat-val.red { color: var(--red); }
 
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+        /* ── Sidebar ── */
+        .sidebar { display: flex; flex-direction: column; gap: 16px; }
 
-        .card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: var(--shadow);
+        .panel {
+            background: var(--surface);
             border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
         }
 
-        .card-header {
+        .panel-head {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 16px;
         }
 
-        .card-title {
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.875rem;
+        .panel-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
             font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: var(--border);
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 0.75rem;
-        }
-
-        .controls-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .violation-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .violation-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            margin-bottom: 8px;
-            font-size: 0.875rem;
-        }
-
-        .violation-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .violation-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--danger);
-            flex-shrink: 0;
-        }
-
-        .violation-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .violation-type {
-            font-weight: 500;
-            margin-bottom: 2px;
-        }
-
-        .violation-time {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 32px;
-            color: var(--text-secondary);
-        }
-
-        .empty-state svg {
-            width: 48px;
-            height: 48px;
-            margin-bottom: 12px;
-            opacity: 0.5;
-        }
-
-        .settings-group {
-            margin-bottom: 16px;
-        }
-
-        .settings-group:last-child {
-            margin-bottom: 0;
-        }
-
-        .settings-row {
+        /* ── Metrics ── */
+        .metric {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -427,420 +274,252 @@
             border-bottom: 1px solid var(--border);
         }
 
-        .settings-row:last-child {
-            border-bottom: none;
+        .metric:last-child { border-bottom: none; }
+
+        .metric-name {
+            font-size: 0.85rem;
+            color: var(--muted);
         }
 
-        .settings-label {
-            font-size: 0.875rem;
-        }
-
-        .toggle {
-            position: relative;
-            width: 44px;
-            height: 24px;
-        }
-
-        .toggle input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--border);
-            border-radius: 24px;
-            transition: 0.3s;
-        }
-
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background: white;
+        .metric-dot {
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
-            transition: 0.3s;
+            display: inline-block;
+            margin-right: 8px;
         }
 
-        .toggle input:checked + .toggle-slider {
-            background: var(--accent);
-        }
+        .metric-dot.ok { background: var(--green); }
+        .metric-dot.warn { background: var(--amber); }
+        .metric-dot.bad { background: var(--red); }
 
-        .toggle input:checked + .toggle-slider:before {
-            transform: translateX(20px);
-        }
-
-        select {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.875rem;
-        }
-
-        .metrics-grid {
-            display: grid;
-            gap: 12px;
-        }
-
-        .metric-row {
+        .metric-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 4px;
         }
 
-        .metric-label {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        .metric-value {
-            font-weight: 600;
-            font-family: monospace;
-        }
-
-        .progress-bar {
-            height: 6px;
-            background: var(--bg-secondary);
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 3px;
-            transition: width 0.3s ease;
-        }
-
-        .progress-fill.success { background: var(--success); }
-        .progress-fill.warning { background: var(--warning); }
-        .progress-fill.danger { background: var(--danger); }
-
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 24px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
+        /* ── Violations ── */
+        .violations {
+            max-height: 220px;
             overflow-y: auto;
         }
 
-        .modal-header {
+        .violations::-webkit-scrollbar { width: 3px; }
+        .violations::-webkit-scrollbar-track { background: transparent; }
+        .violations::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        .v-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.82rem;
         }
 
-        .modal-close {
+        .v-item:last-child { border-bottom: none; }
+
+        .v-type { color: var(--text); }
+
+        .v-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--muted);
+        }
+
+        .empty {
+            text-align: center;
+            padding: 28px 0;
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+
+        .empty-icon {
+            width: 32px;
+            height: 32px;
+            margin: 0 auto 8px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+        }
+
+        /* ── Buttons ── */
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            letter-spacing: 0.02em;
+        }
+
+        .btn:hover {
+            color: var(--text);
+            border-color: var(--muted);
+        }
+
+        .btn.danger:hover {
+            color: var(--red);
+            border-color: rgba(248, 113, 113, 0.4);
+        }
+
+        .text-btn {
             background: none;
             border: none;
-            color: var(--text-secondary);
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.7rem;
             cursor: pointer;
-            font-size: 1.5rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
 
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-secondary);
-        }
+        .text-btn:hover { color: var(--text); }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <div class="logo-icon">
-                    <svg width="24" height="24" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                        <circle cx="12" cy="12" r="3"/>
-                    </svg>
-                </div>
-                <h1>AI Proctor</h1>
+    <div class="app">
+        <nav>
+            <div class="brand">
+                <span class="brand-dot"></span>
+                Proctor
             </div>
-            <div class="header-controls">
-                <div class="status-badge active">
-                    <span class="status-dot"></span>
-                    <span>Session Active</span>
-                </div>
-                <button class="theme-toggle" onclick="toggleTheme()">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="5"/>
-                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-                    </svg>
-                </button>
-            </div>
-        </header>
+            <div class="live-pill" id="sessionTime">00:00:00</div>
+        </nav>
 
-        <div class="main-grid">
-            <div class="video-section">
-                <div class="alert-banner" id="alertBanner">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-                        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-                    </svg>
-                    <span id="alertText">No face detected</span>
-                </div>
-
-                <div class="video-container">
-                    <img src="/video_feed" alt="Video Feed">
-                    <div class="video-overlay">
-                        <div class="recording-indicator">
-                            <span class="dot"></span>
-                            <span>REC</span>
+        <div class="layout">
+            <div>
+                <div class="video-wrap">
+                    <img src="/video_feed" alt="Feed">
+                    <div class="video-hud">
+                        <div class="hud-top">
+                            <div class="rec-badge">rec</div>
+                            <div class="timer" id="timerDisplay">00:00:00</div>
                         </div>
-                        <div class="time-display" id="sessionTime">00:00:00</div>
+                        <div class="hud-bottom">
+                            <div class="alert-toast" id="alertToast"></div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="quick-stats">
-                    <div class="stat-card success">
-                        <div class="label">Focus Score</div>
-                        <div class="value" id="focusScore">100%</div>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-label">Focus</div>
+                        <div class="stat-val green" id="focusScore">100%</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="label">Time Focused</div>
-                        <div class="value" id="timeFocused">0:00</div>
+                    <div class="stat">
+                        <div class="stat-label">Duration</div>
+                        <div class="stat-val" id="timeFocused">0:00</div>
                     </div>
-                    <div class="stat-card warning">
-                        <div class="label">Warnings</div>
-                        <div class="value" id="warningCount">0</div>
+                    <div class="stat">
+                        <div class="stat-label">Warnings</div>
+                        <div class="stat-val amber" id="warningCount">0</div>
                     </div>
-                    <div class="stat-card danger">
-                        <div class="label">Violations</div>
-                        <div class="value" id="violationCount">0</div>
+                    <div class="stat">
+                        <div class="stat-label">Violations</div>
+                        <div class="stat-val red" id="violationCount">0</div>
                     </div>
                 </div>
             </div>
 
             <div class="sidebar">
-                <div class="card">
-                    <div class="card-header">
-                        <span class="card-title">Session Controls</span>
+                <div class="panel">
+                    <div class="panel-head">
+                        <span class="panel-title">Detection</span>
                     </div>
-                    <div class="controls-grid">
-                        <button class="btn btn-danger" onclick="resetSession()">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
-                            </svg>
-                            Reset
-                        </button>
-                        <button class="btn btn-secondary" onclick="exportReport()">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-                            </svg>
-                            Export
-                        </button>
-                        <button class="btn btn-primary" onclick="openSettings()" style="grid-column: span 2;">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
-                            </svg>
-                            Settings
-                        </button>
+                    <div class="metric">
+                        <span class="metric-name">Face</span>
+                        <span class="metric-val"><span class="metric-dot ok" id="faceDot"></span><span id="faceStatus">Detected</span></span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-name">Gaze</span>
+                        <span class="metric-val"><span class="metric-dot ok" id="gazeDot"></span><span id="gazeStatus">Center</span></span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-name">Head</span>
+                        <span class="metric-val"><span class="metric-dot ok" id="headDot"></span><span id="headStatus">Normal</span></span>
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <span class="card-title">Detection Metrics</span>
+                <div class="panel" style="flex:1;">
+                    <div class="panel-head">
+                        <span class="panel-title">Violations</span>
+                        <button class="text-btn" onclick="clearViolations()">Clear</button>
                     </div>
-                    <div class="metrics-grid">
-                        <div>
-                            <div class="metric-row">
-                                <span class="metric-label">Face Detected</span>
-                                <span class="metric-value" id="faceStatus">Yes</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill success" id="faceProgress" style="width: 100%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="metric-row">
-                                <span class="metric-label">Gaze Direction</span>
-                                <span class="metric-value" id="gazeStatus">Center</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill success" id="gazeProgress" style="width: 100%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="metric-row">
-                                <span class="metric-label">Head Position</span>
-                                <span class="metric-value" id="headStatus">Normal</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill success" id="headProgress" style="width: 100%"></div>
-                            </div>
+                    <div class="violations" id="violationList">
+                        <div class="empty">
+                            <div class="empty-icon">✓</div>
+                            No violations
                         </div>
                     </div>
                 </div>
 
-                <div class="card" style="flex: 1; display: flex; flex-direction: column;">
-                    <div class="card-header">
-                        <span class="card-title">Recent Violations</span>
-                        <button class="btn btn-sm btn-secondary" onclick="clearViolations()">Clear</button>
-                    </div>
-                    <div class="violation-list" id="violationList">
-                        <div class="empty-state">
-                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <p>No violations recorded</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="settingsModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2>Settings</h2>
-                <button class="modal-close" onclick="closeSettings()">&times;</button>
-            </div>
-            <div class="settings-group">
-                <div class="settings-row">
-                    <span class="settings-label">Detection Sensitivity</span>
-                    <select id="sensitivity" onchange="updateSettings()">
-                        <option value="low">Low</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="high">High</option>
-                    </select>
-                </div>
-                <div class="settings-row">
-                    <span class="settings-label">Alert Sounds</span>
-                    <label class="toggle">
-                        <input type="checkbox" id="alertSound" checked onchange="updateSettings()">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="settings-row">
-                    <span class="settings-label">Auto-pause on Violation</span>
-                    <label class="toggle">
-                        <input type="checkbox" id="autoPause" onchange="updateSettings()">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="settings-row">
-                    <span class="settings-label">Record Violations</span>
-                    <label class="toggle">
-                        <input type="checkbox" id="recordViolations" checked onchange="updateSettings()">
-                        <span class="toggle-slider"></span>
-                    </label>
+                <div class="actions">
+                    <button class="btn danger" onclick="resetSession()">Reset</button>
+                    <button class="btn" onclick="exportReport()">Export</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let alertAudio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleQAA');
-        
-        function toggleTheme() {
-            const html = document.documentElement;
-            const current = html.getAttribute('data-theme');
-            html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-            localStorage.setItem('theme', html.getAttribute('data-theme'));
-        }
-
-        function loadTheme() {
-            const saved = localStorage.getItem('theme');
-            if (saved) document.documentElement.setAttribute('data-theme', saved);
-        }
-
         function updateStats() {
             fetch('/api/stats')
                 .then(r => r.json())
-                .then(data => {
-                    document.getElementById('sessionTime').textContent = data.session_duration || '00:00:00';
-                    document.getElementById('focusScore').textContent = (data.focus_score || 100) + '%';
-                    document.getElementById('warningCount').textContent = data.warnings || 0;
-                    document.getElementById('violationCount').textContent = data.violations || 0;
-                    
-                    const focusCard = document.querySelector('.stat-card.success');
-                    const score = data.focus_score || 100;
-                    focusCard.className = 'stat-card ' + (score >= 80 ? 'success' : score >= 50 ? 'warning' : 'danger');
-                    
-                    updateAlert(data);
-                    updateMetrics(data);
+                .then(d => {
+                    const time = d.session_duration || '00:00:00';
+                    document.getElementById('sessionTime').textContent = time;
+                    document.getElementById('timerDisplay').textContent = time;
+
+                    const score = d.focus_score ?? 100;
+                    const el = document.getElementById('focusScore');
+                    el.textContent = score + '%';
+                    el.className = 'stat-val ' + (score >= 80 ? 'green' : score >= 50 ? 'amber' : 'red');
+
+                    document.getElementById('warningCount').textContent = d.warnings || 0;
+                    document.getElementById('violationCount').textContent = d.violations || 0;
+
+                    // Alert toast
+                    const toast = document.getElementById('alertToast');
+                    if (d.current_violation) {
+                        toast.className = 'alert-toast danger';
+                        toast.textContent = d.current_violation;
+                    } else if (d.warning) {
+                        toast.className = 'alert-toast warning';
+                        toast.textContent = d.warning;
+                    } else {
+                        toast.className = 'alert-toast';
+                    }
+
+                    // Metrics
+                    const face = d.face_detected !== false;
+                    document.getElementById('faceStatus').textContent = face ? 'Detected' : 'Missing';
+                    document.getElementById('faceDot').className = 'metric-dot ' + (face ? 'ok' : 'bad');
+
+                    const gaze = d.gaze_direction || 'Center';
+                    document.getElementById('gazeStatus').textContent = gaze;
+                    document.getElementById('gazeDot').className = 'metric-dot ' + (gaze === 'Center' ? 'ok' : 'warn');
+
+                    const head = d.head_position || 'Normal';
+                    document.getElementById('headStatus').textContent = head;
+                    document.getElementById('headDot').className = 'metric-dot ' + (head === 'Normal' ? 'ok' : 'warn');
                 });
-        }
-
-        function updateAlert(data) {
-            const banner = document.getElementById('alertBanner');
-            const text = document.getElementById('alertText');
-            
-            if (data.current_violation) {
-                banner.className = 'alert-banner danger';
-                text.textContent = data.current_violation;
-                if (document.getElementById('alertSound').checked) {
-                    alertAudio.play().catch(() => {});
-                }
-            } else if (data.warning) {
-                banner.className = 'alert-banner warning';
-                text.textContent = data.warning;
-            } else {
-                banner.className = 'alert-banner';
-            }
-        }
-
-        function updateMetrics(data) {
-            const face = data.face_detected !== false;
-            document.getElementById('faceStatus').textContent = face ? 'Yes' : 'No';
-            document.getElementById('faceProgress').className = 'progress-fill ' + (face ? 'success' : 'danger');
-            document.getElementById('faceProgress').style.width = face ? '100%' : '0%';
-            
-            const gaze = data.gaze_direction || 'Center';
-            document.getElementById('gazeStatus').textContent = gaze;
-            const gazeOk = gaze === 'Center';
-            document.getElementById('gazeProgress').className = 'progress-fill ' + (gazeOk ? 'success' : 'warning');
-            
-            const head = data.head_position || 'Normal';
-            document.getElementById('headStatus').textContent = head;
-            const headOk = head === 'Normal';
-            document.getElementById('headProgress').className = 'progress-fill ' + (headOk ? 'success' : 'warning');
         }
 
         function updateViolations() {
@@ -849,94 +528,35 @@
                 .then(violations => {
                     const list = document.getElementById('violationList');
                     if (!violations.length) {
-                        list.innerHTML = `<div class="empty-state">
-                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <p>No violations recorded</p>
-                        </div>`;
+                        list.innerHTML = '<div class="empty"><div class="empty-icon">✓</div>No violations</div>';
                         return;
                     }
-                    
-                    list.innerHTML = violations.slice(-10).reverse().map(v => `
-                        <div class="violation-item">
-                            <div class="violation-icon">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                </svg>
-                            </div>
-                            <div class="violation-info">
-                                <div class="violation-type">${v.type}</div>
-                                <div class="violation-time">${new Date(v.timestamp).toLocaleTimeString()}</div>
-                            </div>
-                        </div>
-                    `).join('');
+                    list.innerHTML = violations.slice(-8).reverse().map(v =>
+                        `<div class="v-item">
+                            <span class="v-type">${v.type}</span>
+                            <span class="v-time">${new Date(v.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>
+                        </div>`
+                    ).join('');
                 });
         }
 
         function resetSession() {
-            if (confirm('Reset session and clear all data?')) {
-                fetch('/api/reset', { method: 'POST' })
-                    .then(() => {
-                        updateStats();
-                        updateViolations();
-                    });
+            if (confirm('Reset session?')) {
+                fetch('/api/reset', { method: 'POST' }).then(() => { updateStats(); updateViolations(); });
             }
         }
 
         function exportReport() {
-            fetch('/api/export')
-                .then(r => r.json())
-                .then(data => {
-                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `proctor-report-${new Date().toISOString().slice(0,10)}.json`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                });
-        }
-
-        function openSettings() {
-            document.getElementById('settingsModal').classList.add('active');
-            fetch('/api/settings')
-                .then(r => r.json())
-                .then(data => {
-                    document.getElementById('sensitivity').value = data.sensitivity || 'medium';
-                    document.getElementById('alertSound').checked = data.alert_sound !== false;
-                    document.getElementById('autoPause').checked = data.auto_pause || false;
-                    document.getElementById('recordViolations').checked = data.record_violations !== false;
-                });
-        }
-
-        function closeSettings() {
-            document.getElementById('settingsModal').classList.remove('active');
-        }
-
-        function updateSettings() {
-            const settings = {
-                sensitivity: document.getElementById('sensitivity').value,
-                alert_sound: document.getElementById('alertSound').checked,
-                auto_pause: document.getElementById('autoPause').checked,
-                record_violations: document.getElementById('recordViolations').checked
-            };
-            fetch('/api/settings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(settings)
+            fetch('/api/export').then(r => r.json()).then(data => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+                a.download = `proctor-${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
             });
         }
 
-        function clearViolations() {
-            resetSession();
-        }
+        function clearViolations() { resetSession(); }
 
-        document.getElementById('settingsModal').addEventListener('click', e => {
-            if (e.target.id === 'settingsModal') closeSettings();
-        });
-
-        loadTheme();
         setInterval(updateStats, 1000);
         setInterval(updateViolations, 3000);
         updateStats();
