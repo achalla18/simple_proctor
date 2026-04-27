@@ -1,6 +1,6 @@
-# Machine Learning based Proctoring System - Simple Version
+# Simple Proctor (Version 1)
 
-A simple, working Machine Learning based proctoring system for exam monitoring.
+A simple computer vision based proctoring system for exam monitoring.
 
 ## Features
 
